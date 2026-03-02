@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para ti</title>
+    <title>Un Sentimiento Sincero</title>
     <style>
         /* Estilos generales y fondo */
         body {
             margin: 0;
             padding: 0;
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            font-family: 'Georgia', serif; /* Fuente elegante y formal */
+            font-family: 'Georgia', serif;
             min-height: 100vh;
-            overflow-x: hidden; /* Evita scroll horizontal cuando el botón se vuelve loco */
+            overflow-x: hidden;
+            display: flex; /* Para centrar la carta en móviles */
+            justify-content: center;
+            align-items: center;
         }
 
         /* Contenedor de la carta */
         .caja-carta {
             background-color: #ffffff;
+            width: 90%; /* Responsive: ocupa casi todo el ancho */
             max-width: 650px;
             margin: 60px auto;
             padding: 50px;
             border-radius: 12px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             position: relative;
-            z-index: 2; /* Para que la carta quede por encima de las flores */
+            z-index: 1; /* Corregido: la carta queda por debajo */
+            box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
         }
 
         /* Secciones de texto */
@@ -58,7 +63,7 @@
             font-weight: bold;
             border-radius: 50px;
             cursor: pointer;
-            z-index: 10;
+            z-index: 100; /* Botón siempre visible */
             box-shadow: 0 8px 15px rgba(232, 67, 147, 0.4);
             transition: top 0.3s ease, left 0.3s ease, transform 0.1s;
         }
@@ -70,16 +75,60 @@
         /* Animación y estilo de las flores */
         .flor-anim {
             position: fixed;
-            font-size: 2.5rem;
-            z-index: 1;
-            pointer-events: none; /* Para que no estorben si pasas el mouse */
-            animation: m_AnimFlor 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            z-index: 10; /* Flores por encima de la carta */
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: m_AnimFlor 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Estilo para las partículas de brillo */
+        .flor-bril {
+            position: absolute;
+            width: 50px; /* Tamaño inicial */
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            animation: m_AnimBril 0.6s ease-out forwards;
+            opacity: 0;
+            pointer-events: none;
         }
 
         @keyframes m_AnimFlor {
-            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
-            50% { transform: scale(1.2) rotate(10deg); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes m_AnimBril {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* Media Query para pantallas pequeñas */
+        @media (max-width: 600px) {
+            .caja-carta {
+                margin: 20px auto;
+                padding: 30px;
+            }
+
+            .titl-cart {
+                font-size: 2rem;
+            }
+
+            .text-larg {
+                font-size: 1.1rem;
+                text-align: left; /* Mejor para móviles */
+            }
+
+            #v_BotoPlan {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -108,6 +157,8 @@
 
         // Arreglo de emojis para que haya variedad de flores
         const a_ListFlor = ['🌸', '🌻', '🌷', '🌺', '🌼', '🌹'];
+        // Arreglo de colores para las partículas de brillo
+        const a_ListColo = ['#ff7675', '#f1c40f', '#e84393', '#1dd1a1', '#54a0ff'];
 
         v_BotoPlan.addEventListener('click', function(p_Even) {
             // 1. Plantar la flor en la posición actual del botón
@@ -125,21 +176,39 @@
             const v_IndiRand = Math.floor(Math.random() * a_ListFlor.length);
             v_FlorElem.innerText = a_ListFlor[v_IndiRand];
 
+            // Variedad de tamaños: entre 2rem y 4rem
+            const v_NuevSize = (Math.random() * 2 + 2) + 'rem';
+            v_FlorElem.style.fontSize = v_NuevSize;
+
+            // Rotación aleatoria al aparecer
+            const v_NuevRotc = (Math.random() * 360) + 'deg';
+            v_FlorElem.style.transform = `rotate(${v_NuevRotc})`;
+
+            // Crear partícula de brillo
+            const v_BrilElem = document.createElement('div');
+            v_BrilElem.classList.add('flor-bril');
+            // Color aleatorio para el brillo
+            const v_ColoRand = a_ListColo[Math.floor(Math.random() * a_ListColo.length)];
+            v_BrilElem.style.background = `radial-gradient(circle, ${v_ColoRand}cc 0%, ${v_ColoRand}00 70%)`;
+            v_FlorElem.appendChild(v_BrilElem);
+
             // Centrar la flor donde estaba el click
-            v_FlorElem.style.left = (p_PosX - 20) + 'px'; 
-            v_FlorElem.style.top = (p_PosY - 20) + 'px';
+            // Se calcula un offset aproximado basado en el tamaño para centrar mejor
+            const v_OffsCent = parseFloat(v_NuevSize) * 8; // Estimación simple
+            v_FlorElem.style.left = (p_PosX - v_OffsCent) + 'px'; 
+            v_FlorElem.style.top = (p_PosY - v_OffsCent) + 'px';
 
             v_CajaJard.appendChild(v_FlorElem);
         }
 
         function m_MuevBoto() {
             // Calcular limites para que el botón no se salga de la pantalla
-            // Max 4 letras: Maxi, Horz, Vert
             const v_MaxiHorz = window.innerWidth - v_BotoPlan.offsetWidth - 20;
             const v_MaxiVert = window.innerHeight - v_BotoPlan.offsetHeight - 20;
 
-            const v_NuevPosX = Math.random() * v_MaxiHorz;
-            const v_NuevPosY = Math.random() * v_MaxiVert;
+            // Asegurarse de que las coordenadas no sean negativas
+            const v_NuevPosX = Math.max(10, Math.random() * v_MaxiHorz);
+            const v_NuevPosY = Math.max(10, Math.random() * v_MaxiVert);
 
             // Mover el botón
             v_BotoPlan.style.left = v_NuevPosX + 'px';
