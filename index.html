@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti</title>
+    <style>
+        /* Estilos generales y fondo */
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            font-family: 'Georgia', serif; /* Fuente elegante y formal */
+            min-height: 100vh;
+            overflow-x: hidden; /* Evita scroll horizontal cuando el botón se vuelve loco */
+        }
+
+        /* Contenedor de la carta */
+        .caja-carta {
+            background-color: #ffffff;
+            max-width: 650px;
+            margin: 60px auto;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 2; /* Para que la carta quede por encima de las flores */
+        }
+
+        /* Secciones de texto */
+        .titl-cart {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f1c40f;
+            padding-bottom: 10px;
+        }
+
+        .text-larg {
+            font-size: 1.2rem;
+            color: #34495e;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        /* El botón escurridizo */
+        #v_BotoPlan {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            background-color: #e84393;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 8px 15px rgba(232, 67, 147, 0.4);
+            transition: top 0.3s ease, left 0.3s ease, transform 0.1s;
+        }
+
+        #v_BotoPlan:active {
+            transform: scale(0.9);
+        }
+
+        /* Animación y estilo de las flores */
+        .flor-anim {
+            position: fixed;
+            font-size: 2.5rem;
+            z-index: 1;
+            pointer-events: none; /* Para que no estorben si pasas el mouse */
+            animation: m_AnimFlor 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes m_AnimFlor {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="v_CajaJard"></div>
+
+    <div class="caja-carta">
+        <h1 class="titl-cart">Un Sentimiento Sincero</h1>
+        
+        <div class="text-larg">
+            <p>Estimada y amada mía,</p>
+            <p>A través de la presente misiva, deseo expresar la profundidad de los sentimientos que albergo en mi corazón. Cada instante compartido ha enriquecido mi existencia de una manera que las palabras apenas logran describir. Es mi más sincero deseo que este detalle transmita la admiración y el respeto que te profeso.</p>
+            <p>La belleza de tu presencia ilumina mis días, y la nobleza de tu espíritu es un faro constante. Permite que estas letras sean un testimonio inquebrantable de mi afecto, el cual florece con el paso del tiempo.</p>
+            <p>Con devoción y cariño profundo,</p>
+            <p><strong>[Tu Firma/Nombre]</strong></p>
+        </div>
+    </div>
+
+    <button id="v_BotoPlan">Plantar 🌸</button>
+
+    <script>
+        // Variables siguiendo reglas (prefijos y palabras de max 4 letras cap)
+        const v_BotoPlan = document.getElementById('v_BotoPlan');
+        const v_CajaJard = document.getElementById('v_CajaJard');
+
+        // Arreglo de emojis para que haya variedad de flores
+        const a_ListFlor = ['🌸', '🌻', '🌷', '🌺', '🌼', '🌹'];
+
+        v_BotoPlan.addEventListener('click', function(p_Even) {
+            // 1. Plantar la flor en la posición actual del botón
+            m_CreaFlor(p_Even.clientX, p_Even.clientY);
+
+            // 2. Mover el botón a una posición aleatoria
+            m_MuevBoto();
+        });
+
+        function m_CreaFlor(p_PosX, p_PosY) {
+            const v_FlorElem = document.createElement('div');
+            v_FlorElem.classList.add('flor-anim');
+            
+            // Seleccionar flor random
+            const v_IndiRand = Math.floor(Math.random() * a_ListFlor.length);
+            v_FlorElem.innerText = a_ListFlor[v_IndiRand];
+
+            // Centrar la flor donde estaba el click
+            v_FlorElem.style.left = (p_PosX - 20) + 'px'; 
+            v_FlorElem.style.top = (p_PosY - 20) + 'px';
+
+            v_CajaJard.appendChild(v_FlorElem);
+        }
+
+        function m_MuevBoto() {
+            // Calcular limites para que el botón no se salga de la pantalla
+            // Max 4 letras: Maxi, Horz, Vert
+            const v_MaxiHorz = window.innerWidth - v_BotoPlan.offsetWidth - 20;
+            const v_MaxiVert = window.innerHeight - v_BotoPlan.offsetHeight - 20;
+
+            const v_NuevPosX = Math.random() * v_MaxiHorz;
+            const v_NuevPosY = Math.random() * v_MaxiVert;
+
+            // Mover el botón
+            v_BotoPlan.style.left = v_NuevPosX + 'px';
+            v_BotoPlan.style.top = v_NuevPosY + 'px';
+            v_BotoPlan.style.bottom = 'auto'; // Resetear el bottom inicial
+            v_BotoPlan.style.right = 'auto';  // Resetear el right inicial
+        }
+    </script>
+</body>
+</html>
